@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4f6fb">
+<meta name="color-scheme" content="light">
+<meta name="description" content="HabitQuest - turn your habits into an RPG adventure.">
+<link rel="manifest" href="manifest.json">
+<title>HabitQuest</title>
+<style>
+:root{
+--bg:#f4f6fb;--ink:#151b2b;--ink2:#465064;--muted:#7a8496;
+--glass:rgba(255,255,255,.62);--glass2:rgba(255,255,255,.82);--fill:rgba(21,27,43,.045);--fill2:rgba(21,27,43,.08);
+--edge:rgba(21,27,43,.09);--rim:rgba(255,255,255,.9);
+--shadow:0 1px 2px rgba(21,27,43,.04),0 10px 30px rgba(21,27,43,.07);
+--good:#16a34a;--good-ink:#15803d;--bad:#e11d48;--bad-ink:#be123c;--blue:#3b6cf6;--gold:#d99a12;--gold-ink:#946207;--purple:#7c5cf0;--purple-ink:#5b3fd0
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(520px 320px at 8% -4%,rgba(99,132,255,.20),transparent 70%),radial-gradient(460px 300px at 100% 6%,rgba(52,211,153,.16),transparent 70%),radial-gradient(560px 360px at 60% 100%,rgba(251,146,60,.12),transparent 70%)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.i{flex:none;display:block}
+.ic{display:inline-flex;align-items:center;gap:6px}
+h2,h3{margin:0;letter-spacing:-.01em}
+.app{max-width:560px;margin:auto;padding:0 14px calc(100px + env(safe-area-inset-bottom))}
+
+/* glass surfaces */
+.card,.stat,.nav,.sheet{-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5)}
+.card{background:var(--glass);border:1px solid var(--edge);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow),inset 0 1px 0 var(--rim)}
+.card h3{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:650;margin-bottom:12px}
+.card h3 .i{color:var(--muted)}
+
+/* header */
+.top{position:sticky;top:0;z-index:5;margin:0 -14px 14px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;background:rgba(244,246,251,.7);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);border-bottom:1px solid var(--edge)}
+.header{display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:11px;background:var(--ink);color:#fff;display:grid;place-items:center;box-shadow:0 4px 12px rgba(21,27,43,.2)}
+.brandname{font-size:17px;font-weight:650;letter-spacing:-.02em;line-height:1.1}
+.subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+.iconbtn{width:38px;height:38px;border-radius:12px;background:var(--glass);border:1px solid var(--edge);display:grid;place-items:center;color:var(--ink2)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stat{background:var(--glass);border:1px solid var(--edge);border-radius:14px;padding:9px 10px;box-shadow:0 1px 2px rgba(21,27,43,.04),inset 0 1px 0 var(--rim)}
+.statrow{display:flex;justify-content:space-between;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.statrow .ic{gap:5px}
+.stat b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.bar{height:5px;background:var(--fill2);border-radius:99px;overflow:hidden;margin-top:8px}
+.fill{height:100%;border-radius:99px;transition:width .4s ease}
+.hp{background:#f43f5e}.xp{background:var(--blue)}.sc{background:var(--good)}
+
+/* bottom navigation */
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(536px,calc(100% - 24px));z-index:6;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px;border-radius:22px;background:var(--glass2);border:1px solid var(--edge);box-shadow:0 10px 34px rgba(21,27,43,.14),inset 0 1px 0 var(--rim)}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:16px;font-size:11px;font-weight:500;color:var(--muted)}
+.nav button.active{background:var(--fill2);color:var(--ink)}
+
+/* segmented control */
+.seg{display:flex;gap:2px;padding:3px;border-radius:13px;background:var(--fill);border:1px solid var(--edge)}
+.seg button{flex:1;padding:8px 10px;border-radius:10px;color:var(--muted);font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.seg button.active{background:var(--glass2);color:var(--ink);box-shadow:0 1px 2px rgba(21,27,43,.08),0 0 0 1px var(--edge)}
+.tabs{margin:0 0 12px}
+
+/* habits */
+.cardhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.habitname{font-weight:600;font-size:15px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:12px;color:var(--muted);margin-top:6px}
+.pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
+.pill.good{color:var(--good-ink);background:rgba(22,163,74,.11)}
+.pill.bad{color:var(--bad-ink);background:rgba(225,29,72,.09)}
+.streak{display:inline-flex;align-items:center;gap:4px}.streak .i{color:#ea7a1a}
+.ghost{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;font-size:12px;font-weight:500;color:var(--ink2);background:var(--fill);border:1px solid var(--edge);flex:none}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.act{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-radius:12px;background:rgba(255,255,255,.72);border:1px solid var(--edge);font-weight:500;box-shadow:0 1px 1px rgba(21,27,43,.04)}
+.act:disabled{opacity:.4;cursor:not-allowed}
+.answered{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--muted);margin-top:10px}
+.answered .i{margin-top:2px}
+.empty{text-align:center;color:var(--muted);padding:22px}
+@media(hover:hover){
+.act.good:hover:not(:disabled){border-color:rgba(22,163,74,.5);color:var(--good-ink);background:rgba(22,163,74,.07)}
+.act.bad:hover:not(:disabled){border-color:rgba(225,29,72,.45);color:var(--bad-ink);background:rgba(225,29,72,.06)}
+.ghost:hover,.row button:hover,.iconbtn:hover{background:var(--fill2)}
+}
+
+/* forms */
+.add,.form{display:grid;gap:10px}
+.lbl{display:grid;gap:6px;font-size:12px;color:var(--muted)}
+.input{width:100%;padding:11px 12px;border-radius:12px;background:rgba(255,255,255,.75);border:1px solid var(--edge);color:var(--ink);font-size:16px}
+.input:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,108,246,.15)}
+select.input{appearance:none;-webkit-appearance:none;padding-right:34px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a8496' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 12px center}
+.primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--ink);color:#fff;padding:12px;border-radius:12px;font-weight:600;box-shadow:0 6px 16px rgba(21,27,43,.18)}
+.primary:active,.secondary:active{transform:scale(.99)}
+.secondary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:12px;font-weight:500;color:var(--ink2);background:var(--fill);border:1px solid var(--edge)}
+.note{font-size:12px;color:var(--muted);margin:0}
+
+/* calendar + chart */
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dow{text-align:center;font-size:11px;color:var(--muted)}
+.day{min-height:36px;border-radius:9px;background:var(--fill);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.day.g{background:rgba(22,163,74,.18);color:var(--good-ink)}
+.day.m{background:rgba(217,119,6,.17);color:#92580a}
+.day.r{background:rgba(225,29,72,.14);color:var(--bad-ink)}
+.day.today{box-shadow:0 0 0 1.5px var(--ink)}
+.plot{margin-top:12px;background:rgba(255,255,255,.5);border:1px solid var(--edge);border-radius:14px;padding:4px}
+canvas{display:block;width:100%;height:230px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.two>.card{margin-bottom:0}
+.two+.card,.two+.two,.card+.two{margin-top:12px}
+.big{display:flex;align-items:center;gap:8px;font-size:26px;font-weight:650;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.small{font-size:12px;color:var(--muted)}
+.gold{color:var(--gold-ink)}.gold .i{color:var(--gold)}
+.flame .i{color:#ea7a1a}
+
+/* lists, rows, tiles */
+.list{display:grid;gap:8px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--edge);border-radius:14px;background:rgba(255,255,255,.55)}
+.row button{display:inline-flex;align-items:center;gap:6px;background:var(--fill);border:1px solid var(--edge);padding:7px 11px;border-radius:10px;font-size:12px;font-weight:500;flex:none}
+.row button.warn{color:var(--bad-ink);background:rgba(225,29,72,.06);border-color:rgba(225,29,72,.18)}
+.rl{display:flex;align-items:center;gap:10px;min-width:0}
+.tile{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--fill);color:var(--ink2);flex:none}
+.locked{opacity:.5}
+.ach{display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;width:100%}
+.check{color:var(--good-ink)}
+.lockic{color:var(--muted)}
+.avatar{width:64px;height:64px;border-radius:20px;background:var(--glass2);border:1px solid var(--edge);display:grid;place-items:center;color:var(--ink);box-shadow:var(--shadow),inset 0 1px 0 var(--rim);flex:none}
+.quest h3 .i{color:var(--purple)}
+.boss{border-color:rgba(124,92,240,.28);background:linear-gradient(145deg,rgba(124,92,240,.09),var(--glass) 60%)}
+.boss h3 .i{color:var(--purple)}
+.boss .fill,.wk .fill{background:var(--purple)}
+.arch summary{list-style:none;display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer}
+.arch summary::-webkit-details-marker{display:none}
+.arch summary .count{font-size:11px;font-weight:600;color:var(--muted);background:var(--fill);padding:1px 8px;border-radius:99px}
+.arch summary .chev{margin-left:auto;color:var(--muted);transition:transform .2s}
+.arch[open] summary .chev{transform:rotate(180deg)}
+.arch .list{margin:12px 0 8px}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(21,27,43,.28);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.modal.show{display:flex}
+.sheet{width:min(560px,100%);max-height:88vh;overflow:auto;background:rgba(255,255,255,.88);border:1px solid var(--rim);border-bottom:0;border-radius:24px 24px 0 0;padding:18px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -12px 40px rgba(21,27,43,.14)}
+.sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sheethead h2{font-size:18px;font-weight:650}
+.close{width:34px;height:34px;border-radius:11px;background:var(--fill);border:1px solid var(--edge);display:grid;place-items:center;color:var(--ink2)}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(12px);background:rgba(21,27,43,.94);color:#fff;padding:10px 16px;border-radius:14px;font-weight:500;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:30;box-shadow:0 10px 30px rgba(21,27,43,.25);max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:20px}
+@media(min-width:561px){.top{border-radius:0 0 20px 20px;border:1px solid var(--edge);border-top:0;margin-bottom:16px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="top">
+  <div class="header">
+    <div class="brand"><div class="logo" data-i="shield" data-s="18"></div><div><div class="brandname">HabitQuest</div><div class="subtitle" id="title">Habit Adventurer</div></div></div>
+    <button class="iconbtn" onclick="openSettings()" aria-label="Settings" data-i="sliders" data-s="18"></button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="statrow"><span class="ic"><span style="color:#f43f5e" data-i="heart" data-s="13"></span>HP</span><b id="hpText">100/100</b></div><div class="bar"><div id="hpBar" class="fill hp"></div></div></div>
+    <div class="stat"><div class="statrow"><span class="ic"><span style="color:var(--blue)" data-i="zap" data-s="13"></span>XP</span><b id="xpText">0/100</b></div><div class="bar"><div id="xpBar" class="fill xp"></div></div></div>
+    <div class="stat" title="Daily score"><div class="statrow"><span class="ic"><span style="color:var(--good)" data-i="target" data-s="13"></span>Score</span><b id="scoreText">0%</b></div><div class="bar"><div id="scoreBar" class="fill sc"></div></div></div>
+  </div>
+</div>
+
+<main id="homePage">
+<div class="seg tabs"><button class="tab active" data-tab="good" onclick="switchTab('good')"><span data-i="check" data-s="15"></span>Good habits</button><button class="tab" data-tab="bad" onclick="switchTab('bad')"><span data-i="x" data-s="15"></span>Bad habits</button></div>
+<div id="habitList"></div>
+<div class="card">
+<h3><span data-i="plus" data-s="17"></span>Add habit</h3>
+<div class="add">
+<input id="habitName" class="input" placeholder="Habit name" maxlength="60">
+<select id="habitType" class="input"><option value="good">Good habit</option><option value="bad">Bad habit</option></select>
+<select id="habitDiff" class="input"><option value="5">Easy — 5 HP/XP</option><option value="10">Medium — 10 HP/XP</option><option value="15">Hard — 15 HP/XP</option></select>
+<button class="primary" onclick="addHabit()">Add to quest log</button>
+</div></div>
+<div id="dailyQuest"></div>
+<div id="bossBox"></div>
+<div id="archivedBox"></div>
+</main>
+
+<main id="statsPage" style="display:none">
+<div class="card"><h3><span data-i="calendar" data-s="17"></span>Calendar</h3><div id="calendar"></div></div>
+<div class="card"><h3><span data-i="trend" data-s="17"></span>Analytics</h3><div class="seg"><button class="active" onclick="setChart('daily',this)">Daily</button><button onclick="setChart('weekly',this)">Weekly</button><button onclick="setChart('monthly',this)">Monthly</button></div><div class="plot"><canvas id="chart" width="520" height="230"></canvas></div><div class="two" style="margin-top:14px"><div><div class="big" id="avg">0%</div><div class="small">Average</div></div><div><div class="big" id="best">0%</div><div class="small">Best</div></div></div></div>
+<div class="two"><div class="card"><div class="big" id="tracked">0</div><div class="small">Days tracked</div></div><div class="card"><div class="big gold" id="totalActions">0</div><div class="small">Habit actions</div></div></div>
+</main>
+
+<main id="rewardsPage" style="display:none">
+<div class="two"><div class="card"><div class="big gold"><span data-i="coin" data-s="24"></span><span id="coins">0</span></div><div class="small">Gold</div></div><div class="card"><div class="big flame"><span data-i="flame" data-s="24"></span><span id="bestStreak">0</span></div><div class="small">Best streak</div></div></div>
+<div class="card"><h3><span data-i="bag" data-s="17"></span>Reward shop</h3><div id="shop" class="list"></div></div>
+<div class="card wk"><h3><span data-i="flag" data-s="17"></span>Weekly challenge</h3><div id="weeklyChallenge"></div></div>
+</main>
+
+<main id="profilePage" style="display:none">
+<div class="card"><div style="display:flex;gap:14px;align-items:center"><div class="avatar" id="avatar"></div><div><h2 style="font-size:20px;font-weight:650" id="heroName">Habit Adventurer</h2><div class="small">Level <span id="level2">1</span> · <span id="heroTitle">Novice</span></div></div></div></div>
+<div class="card"><h3><span data-i="award" data-s="17"></span>Achievements</h3><div id="achievements" class="list"></div></div>
+<div class="card"><h3><span data-i="compass" data-s="17"></span>Missions</h3><div class="list">
+<div class="row"><span>30-Day Habit Mission</span><span class="small">Keep going!</span></div>
+<div class="row"><span>Master a Hard Habit</span><span class="small">Complete 10 hard actions</span></div>
+</div></div>
+</main>
+<div class="footer">HabitQuest saves your progress on this device.</div>
+</div>
+
+<nav class="nav" aria-label="Main">
+<button class="active" data-page="home" onclick="showPage('home',this)"><span data-i="target" data-s="20"></span><span>Quest</span></button>
+<button data-page="stats" onclick="showPage('stats',this)"><span data-i="chart" data-s="20"></span><span>Stats</span></button>
+<button data-page="rewards" onclick="showPage('rewards',this)"><span data-i="trophy" data-s="20"></span><span>Rewards</span></button>
+<button data-page="profile" onclick="showPage('profile',this)"><span data-i="user" data-s="20"></span><span>Hero</span></button>
+</nav>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="sheet"><div class="sheethead"><h2 id="modalTitle">Settings</h2><button class="close" onclick="closeModal()" aria-label="Close" data-i="x" data-s="16"></button></div><div id="modalBody"></div></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const KEY='habitquest_complete_v1';
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const defaultState={
+ level:1,hp:100,xp:0,coins:100,streak:0,bestStreak:0,avatar:'🧙',name:'Habit Adventurer',notifications:false,
+ habits:[
+  {id:uid(),name:'Jump Rope & Calisthenics',type:'good',difficulty:15,streak:4},
+  {id:uid(),name:'Acoustic Guitar Practice',type:'good',difficulty:10,streak:2},
+  {id:uid(),name:'Late Night Screen Time',type:'bad',difficulty:15,streak:1},
+  {id:uid(),name:'Unnecessary Snacking',type:'bad',difficulty:10,streak:0},
+  {id:uid(),name:'Skipping Water',type:'bad',difficulty:5,streak:0}
+ ],days:{},settings:{theme:'dark'}
+};
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||defaultState;
+let activeTab='good',chartMode='daily',editId=null,archOpen=false;
+
+/* ---------- icons (inline SVG, no external assets so it works offline) ---------- */
+const ICONS={
+ shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+ sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+ heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+ zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+ target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+ chart:'<path d="M12 20V10M18 20V4M6 20v-4"/>',
+ trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+ user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>',
+ x:'<path d="M18 6 6 18M6 6l12 12"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+ calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+ trend:'<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+ bag:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18M16 10a4 4 0 0 1-8 0"/>',
+ coin:'<circle cx="12" cy="12" r="9"/><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1 0-2-.5-2.5-1.5M12 6v2M12 16v2"/>',
+ award:'<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',
+ lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+ pencil:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+ archive:'<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>',
+ undo:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+ bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+ flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/>',
+ sword:'<polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/>',
+ crown:'<path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/>',
+ compass:'<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+ download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+ reset:'<path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>',
+ chev:'<path d="m6 9 6 6 6-6"/>'
+};
+const ico=(n,s=18)=>`<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]||''}</svg>`;
+function hydrateIcons(){document.querySelectorAll('[data-i]').forEach(el=>{el.innerHTML=ico(el.dataset.i,+el.dataset.s||18)})}
+
+/* ---------- core helpers ---------- */
+function save(){
+ // keep today's stored score in step with edits made after the last answer, so the day freezes at its final value
+ const tr=state.days[today()];if(tr&&Object.keys(tr.actions||{}).length)tr.score=scoreFor(tr);
+ localStorage.setItem(KEY,JSON.stringify(state));render();
+}
+function toast(s){const t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+function getRecord(d=today()){if(!state.days[d])state.days[d]={actions:{},meta:{},score:null,completedGood:0,completedBad:0};return state.days[d]}
+function levelTitle(l){return l>=50?'Legend':l>=35?'Mythic Hero':l>=25?'Master':l>=15?'Champion':l>=10?'Veteran':l>=5?'Warrior':'Novice'}
+function addXP(n){state.xp+=n;while(state.xp>=100){state.xp-=100;state.level++;state.coins+=100;toast('Level up! +100 gold');}}
+const diffName=d=>d===15?'Hard':d===10?'Medium':'Easy';
+
+/* Persist the hard-mode achievement so editing a habit's difficulty can never take it away. */
+function latchHard(){if(state.habits.some(h=>h.difficulty===15&&h.streak>=10))state.hardModeUnlocked=true}
+
+/* Answering a habit. h.type / h.difficulty are read at this moment only, and a snapshot is stored on
+   the day record (meta) so later edits never reinterpret this answer. */
+function action(h,answer){
+ const r=getRecord(); if(r.actions[h.id]!==undefined){toast('Already answered today');return}
+ const good=h.type==='good', did=answer==='did';
+ r.actions[h.id]=answer;
+ r.meta=r.meta||{};r.meta[h.id]={t:h.type,d:h.difficulty};
+ if(good&&did){state.hp=clamp(state.hp+h.difficulty,0,100);addXP(h.difficulty);state.coins+=h.difficulty*2;h.streak++;r.completedGood++;state.streak++}
+ else if(good&&!did){state.hp=clamp(state.hp-h.difficulty,0,100);state.xp=Math.max(0,state.xp-h.difficulty);h.streak=0;state.streak=0}
+ else if(!good&&did){state.hp=clamp(state.hp-h.difficulty,0,100);state.xp=Math.max(0,state.xp-h.difficulty);h.streak=0;r.completedBad++;state.streak=0}
+ else {state.hp=clamp(state.hp+h.difficulty,0,100);h.streak++;state.streak++}
+ state.bestStreak=Math.max(state.bestStreak,state.streak);
+ if(state.hp===100)state.coins+=5;
+ latchHard();
+ r.score=scoreFor(r);
+ save();toast('Quest recorded');
+}
+
+/* How many good / bad habits count toward a day's score.
+   Archived habits still count on a day they were answered; answered habits count under the type they had when answered. */
+function typeCounts(r){let g=0,b=0;const acts=(r&&r.actions)||{},meta=(r&&r.meta)||{};
+ state.habits.forEach(h=>{const answered=acts[h.id]!==undefined;if(h.archived&&!answered)return;const t=answered&&meta[h.id]?meta[h.id].t:h.type;if(t==='good')g++;else b++});
+ return{g,b}}
+function scoreFor(r){const{g,b}=typeCounts(r);if(!g)return 0;return clamp(((r.completedGood||0)/g*100)-(b?(r.completedBad||0)/b*100:0),0,100)}
+function scoreToday(){return scoreFor(getRecord())}
+/* Past days use the score saved with the day (frozen); only today is live. Legacy days without a saved score fall back to a recompute. */
+function dayScore(d,r){if(!r)return 0;if(d===today())return scoreFor(r);return typeof r.score==='number'?r.score:scoreFor(r)}
+
+function render(){
+ const s=scoreToday(); document.getElementById('hpText').textContent=`${state.hp}/100`;document.getElementById('xpText').textContent=`${state.xp}/100`;
+ document.getElementById('hpBar').style.width=state.hp+'%';document.getElementById('xpBar').style.width=state.xp+'%';document.getElementById('scoreText').textContent=Math.round(s)+'%';document.getElementById('scoreBar').style.width=s+'%';
+ document.getElementById('title').textContent=`Level ${state.level} · ${levelTitle(state.level)}`;
+ renderHabits();renderCalendar();renderStats();renderRewards();renderProfile();renderQuest();renderBoss();
+}
+
+/* ---------- habits ---------- */
+function renderHabits(){
+ const list=document.getElementById('habitList'),hs=state.habits.filter(h=>!h.archived&&h.type===activeTab),r=getRecord();
+ if(!hs.length){list.innerHTML=`<div class="empty">No ${activeTab} habits yet. Add one below.</div>`}
+ else list.innerHTML=hs.map(h=>{
+  const a=r.actions[h.id],disabled=a!==undefined,m=r.meta&&r.meta[h.id],d=m?m.d:h.difficulty,asType=m&&m.t!==h.type?` (logged as a ${m.t} habit)`:'';
+  return `<div class="card"><div class="cardhead"><div><div class="habitname">${esc(h.name)}</div><div class="meta"><span class="pill ${h.type}">${h.type==='good'?'Good':'Bad'}</span><span>${diffName(h.difficulty)} · ${h.difficulty} HP/XP</span><span class="streak">${ico('flame',13)}Streak ${h.streak}</span></div></div><button class="ghost" onclick="openEdit('${h.id}')" aria-label="Edit ${esc(h.name)}">${ico('pencil',14)}Edit</button></div><div class="actions"><button class="act good" ${disabled?'disabled':''} onclick="actionById('${h.id}','did')">${ico('check',16)}I did it</button><button class="act bad" ${disabled?'disabled':''} onclick="actionById('${h.id}','missed')">${ico('x',16)}I didn't</button></div>${disabled?`<div class="answered">${ico('lock',13)}<span>Today: ${a==='did'?'did it':"didn't"} · ${d} HP/XP${asType}. Locked until tomorrow.</span></div>`:''}</div>`}).join('');
+ renderArchived();
+}
+function actionById(id,a){const h=state.habits.find(x=>x.id===id);if(h&&!h.archived)action(h,a)}
+function switchTab(t){activeTab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));renderHabits()}
+function addHabit(){const n=document.getElementById('habitName').value.trim(),type=document.getElementById('habitType').value,d=+document.getElementById('habitDiff').value;if(!n)return toast('Enter a habit name');state.habits.push({id:uid(),name:n,type,difficulty:d,streak:0});document.getElementById('habitName').value='';save();toast('Habit added')}
+
+/* Edit sheet. Name, type and difficulty change the habit going forward only; days already recorded keep their snapshot and stored score. */
+function openEdit(id){
+ const h=state.habits.find(x=>x.id===id);if(!h)return;editId=id;
+ const answered=getRecord().actions[id]!==undefined,sel=(a,b)=>a===b?' selected':'';
+ document.getElementById('modalTitle').textContent='Edit habit';
+ document.getElementById('modalBody').innerHTML=`<div class="form">
+<label class="lbl">Habit name<input id="editName" class="input" maxlength="60" value="${esc(h.name)}"></label>
+<label class="lbl">Type<select id="editType" class="input"><option value="good"${sel(h.type,'good')}>Good habit</option><option value="bad"${sel(h.type,'bad')}>Bad habit</option></select></label>
+<label class="lbl">Difficulty<select id="editDiff" class="input"><option value="5"${sel(+h.difficulty,5)}>Easy — 5 HP/XP</option><option value="10"${sel(+h.difficulty,10)}>Medium — 10 HP/XP</option><option value="15"${sel(+h.difficulty,15)}>Hard — 15 HP/XP</option></select></label>
+<p class="note">Changes apply to future answers only. Past results, scores and stats stay as recorded.${answered?' Today\u2019s answer is already logged and keeps its original settings.':''}</p>
+<button class="primary" onclick="saveEdit()">Save changes</button>
+<button class="secondary" onclick="archiveHabit()">${ico('archive',16)}Archive habit</button>
+<p class="note">Archiving hides the habit from your quest log but keeps all of its history. You can restore it any time from Archived habits.</p>
+</div>`;
+ document.getElementById('modal').classList.add('show');
+}
+function saveEdit(){
+ const h=state.habits.find(x=>x.id===editId);if(!h)return closeModal();
+ const n=document.getElementById('editName').value.trim();if(!n)return toast('Enter a habit name');
+ const type=document.getElementById('editType').value,d=+document.getElementById('editDiff').value;
+ latchHard();
+ const r=getRecord();
+ // an answer logged today before this version existed has no snapshot yet: capture it with the pre-edit values
+ if(r.actions[h.id]!==undefined){r.meta=r.meta||{};if(!r.meta[h.id])r.meta[h.id]={t:h.type,d:h.difficulty}}
+ h.name=n;h.type=type;h.difficulty=d;
+ closeModal();switchTab(type);save();toast('Changes saved');
+}
+function archiveHabit(){
+ const h=state.habits.find(x=>x.id===editId);if(!h)return closeModal();
+ const r=getRecord();
+ if(r.actions[h.id]!==undefined){r.meta=r.meta||{};if(!r.meta[h.id])r.meta[h.id]={t:h.type,d:h.difficulty}}
+ latchHard();
+ h.archived=true;h.archivedAt=today();
+ closeModal();save();toast('Habit archived');
+}
+function restoreHabit(id){const h=state.habits.find(x=>x.id===id);if(!h)return;h.archived=false;delete h.archivedAt;switchTab(h.type);save();toast('Habit restored')}
+function renderArchived(){
+ const box=document.getElementById('archivedBox'),hs=state.habits.filter(h=>h.archived);
+ if(!hs.length){box.innerHTML='';return}
+ box.innerHTML=`<details class="card arch" ${archOpen?'open':''} ontoggle="archOpen=this.open"><summary>${ico('archive',16)}<span>Archived habits</span><span class="count">${hs.length}</span><span class="chev">${ico('chev',16)}</span></summary><div class="list">${hs.map(h=>`<div class="row"><div style="min-width:0"><b>${esc(h.name)}</b><div class="small">${h.type==='good'?'Good':'Bad'} · ${diffName(h.difficulty)} · ${h.difficulty} HP/XP</div></div><button onclick="restoreHabit('${h.id}')">${ico('undo',14)}Restore</button></div>`).join('')}</div><p class="note">Their past results stay in your calendar and stats.</p></details>`;
+}
+
+/* ---------- quest / boss ---------- */
+function renderQuest(){const r=getRecord(),{g,b}=typeCounts(r),done=Object.keys(r.actions).length;document.getElementById('dailyQuest').innerHTML=`<div class="card quest"><h3>${ico('target',17)}Daily quest</h3><div>${done}/${g+b} habits answered today</div><div class="meta">Complete all good habits for 100%. Each bad habit done removes ${b?Math.round(100/b):0} points.</div></div>`}
+function renderBoss(){let progress=0;Object.values(state.days).forEach(r=>progress+=r.completedGood||0);const hp=Math.max(0,500-progress*5);document.getElementById('bossBox').innerHTML=`<div class="card boss"><h3>${ico('sword',17)}Boss battle: Procrastination</h3><div class="statrow"><span>Boss HP</span><b>${hp}/500</b></div><div class="bar"><div class="fill" style="width:${hp/5}%"></div></div><div class="meta">Every completed good habit deals 5 damage. Defeat the boss at 0 HP and earn 500 gold.</div>${hp===0?`<button class="primary" style="margin-top:12px" onclick="claimBoss()">${ico('trophy',16)}Claim boss reward</button>`:''}</div>`}
+function claimBoss(){if(state.bossClaimed)return toast('Reward already claimed');state.bossClaimed=true;state.coins+=500;save();toast('Boss defeated! +500 gold')}
+
+/* ---------- calendar / analytics ---------- */
+function addDay(d,s){return `<div class="day ${s>=80?'g':s>=40?'m':s>0?'r':''} ${d===today()?'today':''}" title="${d}: ${Math.round(s)}%">${new Date(d+'T12:00').getDate()}</div>`}
+function renderCalendar(){const now=new Date(),y=now.getFullYear(),m=now.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();let h='<div class="small" style="margin-bottom:8px">'+now.toLocaleString(undefined,{month:'long',year:'numeric'})+'</div><div class="grid">'+['S','M','T','W','T','F','S'].map(x=>`<div class="dow">${x}</div>`).join('');for(let i=0;i<first;i++)h+='<div></div>';for(let i=1;i<=days;i++){const d=`${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`,r=state.days[d];h+=addDay(d,dayScore(d,r))}h+='</div>';document.getElementById('calendar').innerHTML=h}
+function records(){return Object.entries(state.days).filter(([d,r])=>r&&Object.keys(r.actions||{}).length).sort((a,b)=>a[0].localeCompare(b[0]))}
+function renderStats(){const rs=records(),vals=rs.map(([d,r])=>dayScore(d,r));document.getElementById('avg').textContent=(vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0)+'%';document.getElementById('best').textContent=(vals.length?Math.round(Math.max(...vals)):0)+'%';document.getElementById('tracked').textContent=rs.length;document.getElementById('totalActions').textContent=rs.reduce((n,[,r])=>n+Object.keys(r.actions||{}).length,0);drawChart()}
+function bucketData(mode){const out=[];const now=new Date();if(mode==='daily'){for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(now.getDate()-i);const k=d.toISOString().slice(0,10);out.push([k,dayScore(k,state.days[k])])}}else if(mode==='weekly'){for(let i=7;i>=0;i--){const end=new Date(now);end.setDate(now.getDate()-i*7);let sum=0,n=0;for(let j=0;j<7;j++){const d=new Date(end);d.setDate(end.getDate()-j);const k=d.toISOString().slice(0,10);if(state.days[k]){sum+=dayScore(k,state.days[k]);n++}}out.push(['W'+(8-i),n?sum/n:0])}}else{for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1),y=d.getFullYear(),m=d.getMonth();let sum=0,n=0;Object.entries(state.days).forEach(([k,r])=>{const x=new Date(k+'T12:00');if(x.getFullYear()===y&&x.getMonth()===m){sum+=dayScore(k,r);n++}});out.push([d.toLocaleString(undefined,{month:'short'}),n?sum/n:0])}}return out}
+function drawChart(){
+ const c=document.getElementById('chart');if(!c)return;const W=c.clientWidth,H=230;if(!W)return;
+ const dpr=window.devicePixelRatio||2,ctx=c.getContext('2d');c.width=W*dpr;c.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+ const data=bucketData(chartMode),n=data.length,pl=34,pr=16,pt=16,pb=28,X=i=>pl+i*(W-pl-pr)/(n-1||1),Y=v=>H-pb-(H-pt-pb)*v/100;
+ ctx.font='10px system-ui,sans-serif';ctx.lineWidth=1;ctx.strokeStyle='rgba(21,27,43,.08)';ctx.fillStyle='#7a8496';ctx.textAlign='right';ctx.textBaseline='middle';
+ [0,25,50,75,100].forEach(v=>{ctx.beginPath();ctx.moveTo(pl,Y(v));ctx.lineTo(W-pr,Y(v));ctx.stroke();if(v%50===0)ctx.fillText(String(v),pl-8,Y(v))});
+ const path=()=>{ctx.beginPath();data.forEach((p,i)=>i?ctx.lineTo(X(i),Y(p[1])):ctx.moveTo(X(i),Y(p[1])))};
+ const g=ctx.createLinearGradient(0,pt,0,H-pb);g.addColorStop(0,'rgba(59,108,246,.20)');g.addColorStop(1,'rgba(59,108,246,0)');
+ path();ctx.lineTo(X(n-1),Y(0));ctx.lineTo(X(0),Y(0));ctx.closePath();ctx.fillStyle=g;ctx.fill();
+ path();ctx.strokeStyle='#3b6cf6';ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+ data.forEach((p,i)=>{ctx.beginPath();ctx.arc(X(i),Y(p[1]),3,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#3b6cf6';ctx.stroke()});
+ ctx.fillStyle='#7a8496';ctx.textAlign='center';ctx.textBaseline='alphabetic';const step=Math.ceil(n/7);
+ data.forEach((p,i)=>{if((n-1-i)%step===0)ctx.fillText(String(p[0]).slice(-5),X(i),H-9)});
+}
+function setChart(m,b){chartMode=m;b.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');drawChart()}
+
+/* ---------- rewards ---------- */
+const shopItems=[['shield','Streak Shield',500,'Protect one future streak'],['zap','XP Boost',350,'Instantly gain 100 XP'],['heart','Full Heal',250,'Restore HP to 100'],['crown','Hero Costume',750,'Unlock a cosmetic reward']];
+function renderRewards(){document.getElementById('coins').textContent=state.coins;document.getElementById('bestStreak').textContent=state.bestStreak;document.getElementById('shop').innerHTML=shopItems.map((x,i)=>`<div class="row"><div class="rl"><span class="tile">${ico(x[0],18)}</span><div><b>${x[1]}</b><div class="small">${x[3]}</div></div></div><button onclick="buy(${i})">${ico('coin',14)}${x[2]}</button></div>`).join('');const week=weeklyProgress();document.getElementById('weeklyChallenge').innerHTML=`<b>Complete 10 good habits this week</b><div class="bar" style="margin:10px 0"><div class="fill" style="width:${Math.min(100,week/10*100)}%"></div></div><div class="small">${week}/10 completed · Reward: 300 gold</div>${week>=10&&!state.weekClaimed?'<button class="primary" style="margin-top:12px" onclick="claimWeek()">Claim 300 gold</button>':''}`}
+function weeklyProgress(){const n=new Date(),start=new Date(n);start.setDate(n.getDate()-n.getDay());let c=0;Object.entries(state.days).forEach(([k,r])=>{if(new Date(k+'T12:00')>=start)c+=r.completedGood||0});return c}
+function claimWeek(){state.weekClaimed=true;state.coins+=300;save();toast('Challenge complete! +300 gold')}
+function buy(i){const x=shopItems[i];if(state.coins<x[2])return toast('Not enough gold');state.coins-=x[2];if(i===0)state.shields=(state.shields||0)+1;if(i===1)addXP(100);if(i===2)state.hp=100;if(i===3)state.avatar='🦸';save();toast(x[1]+' purchased')}
+const ach=[['flame','7-Day Warrior',()=>state.bestStreak>=7,'Reach a 7-day streak'],['target','Perfect Day',()=>records().some(([d,r])=>dayScore(d,r)>=100),'Get 100% in one day'],['sword','Centurion',()=>records().reduce((n,[,r])=>n+Object.keys(r.actions||{}).length,0)>=100,'Complete 100 habit actions'],['crown','Legend',()=>state.level>=50,'Reach level 50'],['award','Hard Mode',()=>!!state.hardModeUnlocked||state.habits.some(h=>h.difficulty===15&&h.streak>=10),'Build a 10-streak on a hard habit'],['shield','Prepared',()=>state.shields>0,'Own a streak shield']];
+function renderProfile(){document.getElementById('heroName').textContent=state.name;document.getElementById('level2').textContent=state.level;document.getElementById('heroTitle').textContent=levelTitle(state.level);document.getElementById('avatar').innerHTML=ico(state.avatar==='🧙'?'user':'crown',30);document.getElementById('achievements').innerHTML=ach.map(a=>{const u=a[2]();return `<div class="row ${u?'':'locked'}"><div class="ach"><span class="tile">${ico(a[0],18)}</span><div><b>${a[1]}</b><div class="small">${a[3]}</div></div><div class="${u?'check':'lockic'}">${ico(u?'check':'lock',16)}</div></div></div>`}).join('')}
+function showPage(p,b){document.querySelectorAll('main').forEach(x=>x.style.display='none');document.getElementById(p+'Page').style.display='block';document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');window.scrollTo(0,0);if(p==='stats')drawChart()}
+
+/* ---------- settings ---------- */
+function openSettings(){document.getElementById('modalTitle').textContent='Settings';document.getElementById('modalBody').innerHTML=`<div class="list"><div class="row"><span class="rl"><span class="tile">${ico('user',18)}</span>Hero name</span><button onclick="renameHero()">Edit</button></div><div class="row"><span class="rl"><span class="tile">${ico('bell',18)}</span>Notifications</span><button onclick="enableNotifications()">Enable</button></div><div class="row"><span class="rl"><span class="tile">${ico('download',18)}</span>Data</span><button onclick="exportData()">Export</button></div><div class="row"><span class="rl"><span class="tile">${ico('reset',18)}</span>Reset</span><button class="warn" onclick="resetGame()">Reset</button></div></div><p class="small" style="margin-top:14px">Notifications require browser permission. The app can remind you while open; exact background scheduling depends on the browser/device.</p>`;document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function renameHero(){const n=prompt('Hero name:',state.name);if(n?.trim()){state.name=n.trim();save();closeModal()}}
+function exportData(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));a.download='habitquest-backup.json';a.click()}
+function resetGame(){if(confirm('Reset all HabitQuest progress?')){localStorage.removeItem(KEY);location.reload()}}
+async function enableNotifications(){if(!('Notification'in window))return toast('Notifications not supported');const p=await Notification.requestPermission();if(p==='granted'){state.notifications=true;save();toast('Notifications enabled')}else toast('Notification permission not granted')}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+
+/* Android Chrome throws on `new Notification()`, so fall back to the service worker; fire at most once per day. */
+let lastNote='';
+function notify(body){try{new Notification('HabitQuest',{body,icon:'icons/icon-192.png'})}catch(e){navigator.serviceWorker&&navigator.serviceWorker.ready.then(reg=>reg.showNotification('HabitQuest',{body,icon:'icons/icon-192.png',badge:'icons/icon-192.png',tag:'habitquest-daily'})).catch(()=>{})}}
+
+if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+setInterval(()=>{const n=new Date();if(state.notifications&&n.getHours()===21&&n.getMinutes()===0&&lastNote!==today()){lastNote=today();notify(`Your daily score is ${Math.round(scoreToday())}%. Finish your quests!`)}},30000);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+hydrateIcons();latchHard();render();
+window.addEventListener('resize',()=>{if(document.getElementById('statsPage').style.display!=='none')drawChart()});
+</script>
+</body>
+</html>
